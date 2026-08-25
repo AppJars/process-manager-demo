@@ -133,21 +133,26 @@
   padding-top: var(--lumo-space-m);
 }
 
-.home-actions vaadin-menu-bar vaadin-menu-bar-button > div {
+.home-actions vaadin-menu-bar vaadin-menu-bar-button > div,
+.navbar-tour-menu vaadin-menu-bar-button > div,
+.tour-menu-item {
   display: flex;
   align-items: center;
   gap: var(--lumo-space-xs);
+}
+
+.navbar-tour-menu {
+  margin-right: var(--lumo-space-m);
+}
+
+.tour-menu-item vaadin-icon {
+  width: var(--lumo-icon-size-s);
+  height: var(--lumo-icon-size-s);
+  opacity: 0.85;
 }
 
 .home-links {
   display: flex;
   gap: var(--lumo-space-l);
   flex-wrap: wrap;
-}
-
-/* Tour menu of the navigation bar: icon and label on one line, like the landing page menu */
-.navbar-tour-menu vaadin-menu-bar-button > div {
-  display: flex;
-  align-items: center;
-  gap: var(--lumo-space-xs);
 }

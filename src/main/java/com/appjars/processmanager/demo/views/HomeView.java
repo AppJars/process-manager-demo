@@ -57,8 +57,7 @@ public class HomeView extends VerticalLayout implements HasDynamicTitle {
 
   private static final String APPJARS_SITE_URL = "https://www.appjars.com";
   private static final String GITHUB_ORG_URL = "https://github.com/AppJars";
-  private static final String PROCESS_MANAGER_DOCS_URL =
-      "https://docs.appjars.com/process-manager/overview/";
+  private static final String APPJARS_DOCS_URL = "https://docs.appjars.com/";
 
   public HomeView() {
     addClassName("home-view");
@@ -137,15 +136,19 @@ public class HomeView extends VerticalLayout implements HasDynamicTitle {
 
   private Component createTourMenu() {
     MenuBar menu = new MenuBar();
-    menu.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
+    menu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
+    menu.setOpenOnHover(true);
     SubMenu tours =
         menu.addItem(new Div(VaadinIcon.MAP_MARKER.create(), new Span(t("tour.button")))).getSubMenu();
-    // Tours cover the appjar's views; this landing page has none, so its entry stays disabled.
-    tours.addItem(t("tour.thispage")).setEnabled(false);
-    tours.addSeparator();
-    tours.addItem(t("tour.processes"),
+    tours.addItem(tourItem(VaadinIcon.SERVER, "tour.processes"),
         e -> startViewTour(DemoTour.PROCESS_LIST, ProcessListView.class));
     return menu;
+  }
+
+  private Div tourItem(VaadinIcon icon, String key) {
+    Div item = new Div(icon.create(), new Span(t(key)));
+    item.addClassName("tour-menu-item");
+    return item;
   }
 
   private void startViewTour(DemoTour tour, Class<? extends Component> view) {
@@ -163,7 +166,7 @@ public class HomeView extends VerticalLayout implements HasDynamicTitle {
   private Component createLinksSection() {
     Anchor github = new Anchor(GITHUB_ORG_URL, t("links.github"));
     github.setTarget("_blank");
-    Anchor readme = new Anchor(PROCESS_MANAGER_DOCS_URL, t("links.readme"));
+    Anchor readme = new Anchor(APPJARS_DOCS_URL, t("links.readme"));
     readme.setTarget("_blank");
     Div links = new Div(github, readme);
     links.addClassName("home-links");

@@ -23,7 +23,6 @@ import com.appjars.processmanager.model.AssignableTask;
 import com.appjars.processmanager.model.ProcessDto;
 import com.appjars.processmanager.model.ScheduleStatus;
 import com.appjars.processmanager.service.ProcessService;
-import com.flowingcode.backendcore.model.QuerySpec;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +30,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-/**
- * Seeds a sample process the first time the demo runs, so evaluators land on a populated grid that
- * shows the scheduling, per-row play/pause toggle and the row actions menu (instead of an empty
- * table). Only one process is created: in free mode that is the whole free-tier quota, and exactly
- * one process keeps every row action enabled.
- */
+/** Seeds one sample process when the demo database is empty. */
 @Service
 public class DemoInitializerService {
 
@@ -51,7 +45,7 @@ public class DemoInitializerService {
   @EventListener(ApplicationReadyEvent.class)
   public void initProcesses() {
     try {
-      if (processService.count(new QuerySpec()) > 0) {
+      if (processService.countProcesses(0, 1, null) > 0) {
         return;
       }
       AssignableTask task = pickSampleTask();
@@ -60,22 +54,19 @@ public class DemoInitializerService {
       }
       ProcessDto process = ProcessDto.builder()
           .name("Service update")
-          .schedule("*/5 * * * * *") // every 5 seconds (Spring 6-field cron) so executions show quickly
-          // Save as PAUSED first: save() schedules an ENABLED process via resumeProcess() BEFORE the
-          // id is assigned, which NPEs on the still-null id for a brand-new process.
+          .schedule("*/5 * * * * *")
+          // Persist before activating the schedule so the process has an ID.
           .scheduleStatus(ScheduleStatus.PAUSED)
           .jobQualifiedName(task.getFullyQualifiedName())
           .build();
       processService.save(process);
       logger.info("Seeded demo process '{}'", process.getName());
       try {
-        // Now the id exists, so enabling the schedule works — leaves the demo looking active.
         processService.resumeProcess(process);
       } catch (Exception e) {
         logger.info("Seeded process left paused (schedule not enabled): {}", e.getMessage());
       }
     } catch (Exception e) {
-      // Seeding is best-effort: never let it break application startup.
       logger.warn("Could not seed the demo process: {}", e.getMessage());
     }
   }
